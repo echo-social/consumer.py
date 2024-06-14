@@ -9,15 +9,15 @@ from eth_account import Account
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("consumer")
 
+NETWORK_RPC = os.environ["NETWORK_RPC"]
+AQUARIUS_URL = os.getenv("AQUARIUS_URL")
+SUBGRAPH_URL = os.getenv("SUBGRAPH_URL")
+DID = os.getenv("DID")
+
 WALLET_PRIVATE_KEY = os.getenv("WALLET_PRIVATE_KEY")
 consumer = Account.from_key(private_key=WALLET_PRIVATE_KEY)
 
-SUBGRAPH_URL = os.getenv("SUBGRAPH_URL")
-AQUARIUS_URL = os.getenv("AQUARIUS_URL")
-DID = os.getenv("DID")
-MARKET_RPC_ENDPOINT = os.environ["MARKET_RPC_ENDPOINT"]
-
-config = get_config_dict(MARKET_RPC_ENDPOINT)
+config = get_config_dict(NETWORK_RPC)
 ocean = Ocean(config)
 OCEAN = ocean.OCEAN_token
 
@@ -77,7 +77,7 @@ for fixedRateExchange in fixedRateExchanges["data"]["fixedRateExchanges"]:
         break
 logger.info(exchangeDict)
 
-OCEAN.approve(ocean.fixed_rate_exchange.address, 150, {"from": consumer})
+#OCEAN.approve(ocean.fixed_rate_exchange.address, 150, {"from": consumer})
 
-# create exchange from exchange dict ?!
+# create exchange from exchange dict
 # exchange.buy_DT(to_wei(1), consume_market_fee=0, tx_dict={"from": consumer})
