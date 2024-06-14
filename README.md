@@ -27,6 +27,7 @@ This project uses the following environment variables:
     ```
     cd consumer.py
     python -m venv .venv
+    source .venv/bin/activate
     ```
 
 3. Install the requirements:
@@ -47,6 +48,6 @@ This project uses the following environment variables:
 6. Run the project
 
     ```
-    dotenv ./.venv/bin/python src/main.py
+    dotenv python src/main.py
     ```
 
