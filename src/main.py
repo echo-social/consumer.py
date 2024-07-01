@@ -34,70 +34,71 @@ asset = aquarius.get_ddo(DID)
 datatoken_address = asset.datatokens[0]["address"]
 logger.info({'asset': asset.as_dictionary()})
 
-# Find the exchange id in order to swap base token to dataset token
-# TODO: use server filter
-query = """
-{
-  fixedRateExchanges(subgraphError:deny){
-    id
-    contract
-    exchangeId
-    owner{id}
-    datatoken{
-      id
-      name
-      symbol
-    }
-    price
-    datatokenBalance
-    active
-    totalSwapValue
-    swaps(skip:0, first:1){
-      tx
-      by {
-        id
-      }
-      baseTokenAmount
-      dataTokenAmount
-      createdTimestamp
-    }
-    updates(skip:0, first:1){
-      oldPrice
-      newPrice
-      newActive
-      createdTimestamp
-      tx
-    }
-  }
-}"""
+# # Find the exchange id in order to swap base token to dataset token
+# # TODO: use server filter
+# query = """
+# {
+#   fixedRateExchanges(subgraphError:deny){
+#     id
+#     contract
+#     exchangeId
+#     owner{id}
+#     datatoken{
+#       id
+#       name
+#       symbol
+#     }
+#     price
+#     datatokenBalance
+#     active
+#     totalSwapValue
+#     swaps(skip:0, first:1){
+#       tx
+#       by {
+#         id
+#       }
+#       baseTokenAmount
+#       dataTokenAmount
+#       createdTimestamp
+#     }
+#     updates(skip:0, first:1){
+#       oldPrice
+#       newPrice
+#       newActive
+#       createdTimestamp
+#       tx
+#     }
+#   }
+# }"""
 
 
-headers = {"Content-Type": "application/json"}
-payload = json.dumps({"query": query})
-response = requests.request("POST", SUBGRAPH_URL, headers=headers, data=payload)
-fre_infos = json.loads(response.text)
+# headers = {"Content-Type": "application/json"}
+# payload = json.dumps({"query": query})
+# response = requests.request("POST", SUBGRAPH_URL, headers=headers, data=payload)
+# fre_infos = json.loads(response.text)
 
-one_exchange_info = first.first(
-  fre_infos["data"]["fixedRateExchanges"],
-  key=lambda fre_info: fre_info['datatoken']['id'].lower() == datatoken_address.lower())
-logger.info({'exchange_info': one_exchange_info})
+# one_exchange_info = first.first(
+#   fre_infos["data"]["fixedRateExchanges"],
+#   key=lambda fre_info: fre_info['datatoken']['id'].lower() == datatoken_address.lower())
+# logger.info({'exchange_info': one_exchange_info})
 
-fre_addr = get_address_of_type(config, "FixedPrice")
-fre = FixedRateExchange(config, fre_addr)
-logger.info({'fixed_rate_exchange': fre})
+# fre_addr = get_address_of_type(config, "FixedPrice")
+# fre = FixedRateExchange(config, fre_addr)
+# logger.info({'fixed_rate_exchange': fre})
 
-one_exchange = OneExchange(fre, exchange_id=one_exchange_info['exchangeId'])
-logger.info({'one_exchange': one_exchange})
+# one_exchange = OneExchange(fre, exchange_id=one_exchange_info['exchangeId'])
+# logger.info({'one_exchange': one_exchange})
 
-# Approve tokens
-tokens_needed = one_exchange.BT_needed(to_wei(1), consume_market_fee=0)
-ocean.OCEAN_token.approve(one_exchange.address, tokens_needed, {"from": consumer, "gasPrice": MAX_GAS_PRICE})
+# # Approve tokens
+# tokens_needed = one_exchange.BT_needed(to_wei(1), consume_market_fee=0)
+# ocean.OCEAN_token.approve(one_exchange.address, tokens_needed, {"from": consumer, "gasPrice": MAX_GAS_PRICE})
 
-# Buy data token
-one_exchange.buy_DT(to_wei(1), consume_market_fee=0, tx_dict={"from": consumer, "gasPrice": MAX_GAS_PRICE})
+# # Buy data token
+# one_exchange.buy_DT(to_wei(1), consume_market_fee=0, tx_dict={"from": consumer, "gasPrice": MAX_GAS_PRICE})
 
 # Submit order
 order_tx_id = ocean.assets.pay_for_access_service(asset, {"from": consumer, "gasPrice": MAX_GAS_PRICE})
+logger.info({'order_tx_id': order_tx_id})
 
 # Download the dataset
-asset_dir = ocean.assets.download_asset(asset, consumer, './', order_tx_id)
+asset_dir = ocean.assets.download_asset(asset, consumer, './', order_tx_id.hex())
