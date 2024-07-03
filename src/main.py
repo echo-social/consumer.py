@@ -34,6 +34,14 @@ asset = aquarius.get_ddo(DID)
 datatoken_address = asset.datatokens[0]["address"]
 logger.info({'asset': asset.as_dictionary()})
 
+with open("erc20.json", "r") as fp:
+  erc20_abi = json.loads(fp.read())
+w3 = web3.Web3(web3.Web3.HTTPProvider(NETWORK_RPC))
+token = w3.eth.contract(address=web3.Web3.to_checksum_address(datatoken_address.lower()), abi=erc20_abi)
+balance = token.functions.balanceOf(web3.Web3.to_checksum_address(consumer.address.lower())).call()
+decimals = token.functions.decimals().call()
+logger.info({'balance': balance / 10 ** decimals})
+
 # # Find the exchange id in order to swap base token to dataset token
 # # TODO: use server filter
 # query = """
