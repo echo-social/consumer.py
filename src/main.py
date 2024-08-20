@@ -1,11 +1,10 @@
-import json, requests, logging, web3, os, time, datetime, first
+import json, requests, logging, os, first
 from ocean_lib import aquarius, ocean
-from ocean_lib.ocean.ocean import Ocean, OceanAssets
+from ocean_lib.ocean.ocean import Ocean
 from ocean_lib.ocean.util import to_wei
 from config import get_config_dict
 from eth_account import Account
 from ocean_lib.models.fixed_rate_exchange import (
-    ExchangeArguments,
     FixedRateExchange,
     OneExchange
 )
@@ -49,12 +48,6 @@ if not asset:
 datatoken_address = asset.datatokens[0]["address"]
 logger.info({'asset': asset.as_dictionary()})
 logger.info(f"Datatoken address fetched: {datatoken_address}")
-
-# Establish a Web3 connection
-w3 = web3.Web3(web3.Web3.HTTPProvider(NETWORK_RPC))
-with open("erc20.json", "r") as fp:
-    erc20_abi = json.loads(fp.read())
-token = w3.eth.contract(address=web3.Web3.to_checksum_address(datatoken_address.lower()), abi=erc20_abi)
 
 # Construct a GraphQL query to fetch exchange information from the Ocean Protocol's subgraph
 query = """

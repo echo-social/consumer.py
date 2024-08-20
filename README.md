@@ -45,7 +45,7 @@ This project uses the following environment variables:
 
 Configure the necessary environment variables. Begin by copying the sample environment configuration file:
 
-    cp .env.testnet .env
+    cp .env.mainnet .env
 
 
 Edit the .env file with specifics, such as network RPC URL, Aquarius URL, Subgraph URL, wallet private key, and the DID of the dataset you wish to purchase.
